@@ -1,0 +1,44 @@
+#!/bin/sh
+set eu
+
+APP_NAME="sample_phx_app"
+APP_NODE_NAME="sample-phx-app"
+
+gen_env() {
+  cat <<-EOF >.env
+export APP_COOKIE=$(openssl rand -hex 12)
+export APP_NAME=${APP_NAME}
+export APP_NODE_NAME=${APP_NODE_NAME}
+
+GID=$(id -g)
+UID=$(id -u)
+UNAME=$(uname)
+USER=${USER}
+EOF
+}
+
+if [ -f .env ]; then
+  echo ".env already exists"
+  printf "Overwrite (y/N)? "
+  read -r option
+
+  case "$option" in
+  y | Y)
+    echo "yes"
+    gen_env
+    ;;
+  *)
+    echo "no"
+    exit 0
+    ;;
+  esac
+else
+  gen_env
+fi
+
+echo "
+To load variables in your environment, run this in your terminal:
+
+    . ./.env
+
+"
